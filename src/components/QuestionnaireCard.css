@@ -1,0 +1,127 @@
+.questionnaire-card {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.9) 0%, rgba(230, 248, 236, 0.9) 100%);
+  border-radius: 24px;
+  padding: 32px;
+  cursor: pointer;
+  transition: all 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  border: 1px solid rgba(45, 128, 78, 0.24);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  min-height: 180px;
+  box-shadow: 0 14px 30px rgba(34, 102, 62, 0.14);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+
+.questionnaire-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #6ad08f 0%, #2f8b55 50%, #6ad08f 100%);
+  background-size: 200% 100%;
+  transform: scaleX(0);
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.questionnaire-card::after {
+  content: '';
+  position: absolute;
+  inset: auto -120px -120px auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(67, 177, 111, 0.2) 0%, transparent 70%);
+  transform: scale(0.7);
+  transition: transform 0.45s ease;
+}
+
+.questionnaire-card:hover::before {
+  transform: scaleX(1);
+}
+
+.questionnaire-card:hover::after {
+  transform: scale(1.05);
+}
+
+.questionnaire-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 24px 48px rgba(31, 109, 67, 0.28);
+  border-color: rgba(47, 139, 85, 0.45);
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.98) 0%, rgba(220, 244, 228, 0.95) 100%);
+}
+
+.card-icon {
+  width: 80px;
+  height: 80px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  filter: drop-shadow(0 6px 12px rgba(47, 139, 85, 0.24));
+  animation: floatY 4.5s ease-in-out infinite;
+}
+
+.card-icon-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.questionnaire-card:hover .card-icon {
+  transform: scale(1.14) rotate(4deg);
+  filter: drop-shadow(0 10px 20px rgba(47, 139, 85, 0.34));
+}
+
+.questionnaire-card h3 {
+  margin: 0;
+  color: #245f3d;
+  font-size: 20px;
+  text-align: center;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.questionnaire-card:hover h3 {
+  color: #1f6d43;
+}
+
+.card-arrow {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 28px;
+  color: #4bb777;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.questionnaire-card:hover .card-arrow {
+  transform: translateX(8px) scale(1.2);
+  color: #1f6d43;
+}
+
+@media (max-width: 768px) {
+  .questionnaire-card {
+    padding: 24px;
+    min-height: 160px;
+  }
+  
+  .card-icon {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .questionnaire-card h3 {
+    font-size: 18px;
+  }
+}
+

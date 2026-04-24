@@ -1,0 +1,196 @@
+.impressum-page {
+  min-height: 100vh;
+  background: linear-gradient(145deg, #f5fcf7 0%, #e4f6eb 52%, #cfebdb 100%);
+}
+
+.impressum-header {
+  padding: 20px 32px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(47, 139, 85, 0.2);
+  box-shadow: 0 12px 30px rgba(34, 102, 62, 0.14);
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  min-width: max-content;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+  z-index: 2;
+}
+
+.impressum-header .logo-link {
+  grid-column: 1;
+  justify-self: start;
+  align-self: start;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.logo-link:hover {
+  transform: none;
+}
+
+.header-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  object-position: center;
+  filter: drop-shadow(0 8px 16px rgba(47, 139, 85, 0.3));
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 700;
+  color: #245f3d;
+  letter-spacing: 0.2px;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.brand-text span {
+  display: block;
+}
+
+.impressum-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-self: end;
+  justify-content: flex-end;
+  align-self: start;
+  min-width: 220px;
+}
+
+.impressum-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 32px;
+}
+
+.impressum-content h1 {
+  font-size: 42px;
+  color: #245f3d;
+  margin: 0 0 40px 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.impressum-section {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.94) 0%, rgba(233, 248, 238, 0.92) 100%);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(47, 139, 85, 0.2);
+  box-shadow: 0 14px 34px rgba(31, 109, 67, 0.16);
+  animation: fadeIn 0.5s ease-out both;
+}
+
+.impressum-section:nth-of-type(1) { animation-delay: 0.1s; }
+.impressum-section:nth-of-type(2) { animation-delay: 0.2s; }
+.impressum-section:nth-of-type(3) { animation-delay: 0.3s; }
+.impressum-section:nth-of-type(4) { animation-delay: 0.4s; }
+.impressum-section:nth-of-type(5) { animation-delay: 0.5s; }
+.impressum-section:nth-of-type(6) { animation-delay: 0.6s; }
+
+.impressum-section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 38px rgba(31, 109, 67, 0.2);
+  border-color: rgba(47, 139, 85, 0.35);
+}
+
+.impressum-section h2 {
+  font-size: 24px;
+  color: #2f8b55;
+  margin: 0 0 16px 0;
+  font-weight: 600;
+}
+
+.impressum-section p {
+  font-size: 16px;
+  color: #2e6244;
+  line-height: 1.8;
+  margin: 12px 0;
+}
+
+.impressum-section strong {
+  color: #1f4f35;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .impressum-header {
+    padding: 12px 14px;
+    gap: 10px;
+    grid-template-columns: auto 1fr;
+  }
+
+  .impressum-header-right {
+    min-width: 170px;
+    gap: 10px;
+  }
+
+  .header-logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .brand-text {
+    font-size: 11px;
+  }
+
+
+  .impressum-content {
+    padding: 40px 20px;
+  }
+  
+  .impressum-content h1 {
+    font-size: 32px;
+  }
+  
+  .impressum-section {
+    padding: 24px;
+  }
+  
+  .impressum-section h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .impressum-header {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "logo"
+      "controls";
+    row-gap: 8px;
+  }
+
+  .impressum-header .logo-link {
+    grid-area: logo;
+    justify-self: start;
+  }
+
+  .impressum-header-right {
+    grid-area: controls;
+    width: 100%;
+    justify-content: center;
+    justify-self: stretch;
+    min-width: 0;
+  }
+}
+
