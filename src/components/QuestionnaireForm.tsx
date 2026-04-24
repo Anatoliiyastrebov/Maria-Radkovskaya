@@ -15,14 +15,6 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { ContactMethodsBlock } from './ContactMethodsBlock';
 import './QuestionnaireForm.css';
 
-function isEmptyRequiredValue(value: any): boolean {
-  if (value === null || value === undefined) return true;
-  if (typeof value === 'string') return value.trim() === '';
-  if (Array.isArray(value)) return value.length === 0;
-  if (value instanceof FileList) return value.length === 0;
-  return false;
-}
-
 export const QuestionnaireForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -140,7 +132,7 @@ export const QuestionnaireForm: React.FC = () => {
     }
   };
   
-  const getValidationErrors = (): Record<string, string> => {
+  const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {};
     
     const validateQuestion = (question: QuestionField) => {
@@ -151,11 +143,11 @@ export const QuestionnaireForm: React.FC = () => {
       // Для составных полей (group) проверяем каждое поле отдельно
       if (question.type === 'group' && question.groupedFields) {
         question.groupedFields.forEach(field => {
-          if (field.required && isEmptyRequiredValue(formData[field.id])) {
+          if (field.required && !formData[field.id]) {
             newErrors[field.id] = t('common.required', lang);
           }
         });
-      } else if (question.required && isEmptyRequiredValue(formData[question.id])) {
+      } else if (question.required && !formData[question.id]) {
         // Проверяем основное поле
         newErrors[question.id] = t('common.required', lang);
       }
@@ -181,7 +173,7 @@ export const QuestionnaireForm: React.FC = () => {
           const conditionValue = formData[cond.condition.fieldId];
           if (conditionValue === cond.condition.value) {
             cond.fields.forEach(field => {
-              if (field.required && isEmptyRequiredValue(formData[field.id])) {
+              if (field.required && !formData[field.id]) {
                 newErrors[field.id] = t('common.required', lang);
               }
               // Рекурсивно проверяем вложенные условные поля
@@ -193,16 +185,10 @@ export const QuestionnaireForm: React.FC = () => {
     };
     
     allQuestions.forEach(validateQuestion);
-    return newErrors;
-  };
-
-  const validateForm = (): Record<string, string> => {
-    const newErrors = getValidationErrors();
+    
     setErrors(newErrors);
     return newErrors;
   };
-
-  const canSubmit = consent && Object.keys(getValidationErrors()).length === 0 && !isSubmitting;
   
   // Функция для прокрутки к первой ошибке
   const scrollToFirstError = (errorKeys: string[]) => {
@@ -382,7 +368,7 @@ export const QuestionnaireForm: React.FC = () => {
             <button
               type="submit"
               className="nav-button submit-btn"
-              disabled={!canSubmit}
+              disabled={isSubmitting}
             >
               {isSubmitting ? t('common.submitting', lang) : t('common.submit', lang)}
             </button>
