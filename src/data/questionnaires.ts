@@ -509,8 +509,8 @@ export const childrenQuestionnaire: Questionnaire = {
       type: 'number',
       label: 'Сколько воды пьёт в день',
       labelEn: 'How much water does the child drink per day',
-      placeholder: 'Количество воды',
-      placeholderEn: 'Amount of water',
+      placeholder: 'Количество воды (в литрах)',
+      placeholderEn: 'Amount of water (in liters)',
       unit: 'мл',
       min: 0,
       required: true
@@ -663,8 +663,8 @@ export const femaleQuestionnaire: Questionnaire = {
       label: 'Сколько воды в день Вы пьете? (не чай, не кофе, не другие напитки, а только вода)',
       labelEn: 'How much water do you drink per day? (only pure water, not tea, coffee or other drinks)',
       required: true,
-      placeholder: 'Количество воды',
-      placeholderEn: 'Amount of water',
+      placeholder: 'Количество воды (в литрах)',
+      placeholderEn: 'Amount of water (in liters)',
       unit: 'литров',
       min: 0,
       step: 0.1
@@ -1168,8 +1168,8 @@ export const maleQuestionnaire: Questionnaire = {
       label: 'Сколько воды в день Вы пьете? (не чай, не кофе, не другие напитки, а только вода)',
       labelEn: 'How much water do you drink per day? (only pure water, not tea, coffee or other drinks)',
       required: true,
-      placeholder: 'Количество воды',
-      placeholderEn: 'Amount of water',
+      placeholder: 'Количество воды (в литрах)',
+      placeholderEn: 'Amount of water (in liters)',
       unit: 'литров',
       min: 0,
       step: 0.1

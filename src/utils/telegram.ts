@@ -68,6 +68,57 @@ function buildQuestionLabelMap(questionnaireId: string): Map<string, string> {
   return labels;
 }
 
+function findFieldInQuestions(fields: QuestionField[], fieldId: string): QuestionField | null {
+  for (const field of fields) {
+    if (field.id === fieldId) return field;
+    if (field.conditionalFields) {
+      for (const cond of field.conditionalFields) {
+        const found = findFieldInQuestions(cond.fields, fieldId);
+        if (found) return found;
+      }
+    }
+  }
+  return null;
+}
+
+function getQuestionDefinition(questionnaireId: string, fieldId: string): QuestionField | null {
+  const questionnaire = getQuestionnaireById(questionnaireId);
+  if (!questionnaire) return null;
+  return findFieldInQuestions(questionnaire.questions, fieldId);
+}
+
+function formatNumberRu(value: number): string {
+  return new Intl.NumberFormat('ru-RU', {
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 1,
+    maximumFractionDigits: 2
+  }).format(value);
+}
+
+function getFormattedAnswerValue(
+  questionnaireId: string,
+  key: string,
+  rawValue: unknown
+): string {
+  const question = getQuestionDefinition(questionnaireId, key);
+  const valueString = String(rawValue ?? '').trim();
+  if (!valueString) return '';
+
+  if (question?.options) {
+    const option = question.options.find(opt => opt.value === valueString);
+    if (option) return option.label;
+  }
+
+  if (valueString === 'yes') return 'Да';
+  if (valueString === 'no') return 'Нет';
+
+  const numeric = Number(valueString.replace(',', '.'));
+  if (!Number.isNaN(numeric) && question?.unit) {
+    return `${formatNumberRu(numeric)} ${question.unit}`;
+  }
+
+  return valueString;
+}
+
 /**
  * Отправка файла в Telegram
  * Поддерживает все форматы файлов и правильно обрабатывает ошибки
@@ -295,8 +346,7 @@ function createQuestionnaireHTML(
     let answerHTML = '';
     
     if (Array.isArray(value)) {
-      const questionnaire = getQuestionnaireById(questionnaireId);
-      const question = questionnaire?.questions.find(q => q.id === key);
+      const question = getQuestionDefinition(questionnaireId, key);
       
       const values = value.filter(v => v !== 'other' && v !== 'none');
       if (values.length > 0) {
@@ -327,15 +377,9 @@ function createQuestionnaireHTML(
       ).join('');
       answerHTML += filesList;
     } else {
-      const questionnaire = getQuestionnaireById(questionnaireId);
-      const question = questionnaire?.questions.find(q => q.id === key);
-      
-      if (question?.options) {
-        const option = question.options.find(opt => opt.value === value);
-        answerHTML = `<p style="margin: 5px 0;">${escapeHtml(option ? option.label : String(value))}</p>`;
-      } else {
-        answerHTML = `<p style="margin: 5px 0;">${escapeHtml(String(value))}</p>`;
-      }
+      answerHTML = `<p style="margin: 5px 0;">${escapeHtml(
+        getFormattedAnswerValue(questionnaireId, key, value)
+      )}</p>`;
 
       // Для radio/select с "other" добавляем текст из поля key_other
       if (value === 'other' && formData[`${key}_other`]) {
@@ -655,7 +699,7 @@ function formatQuestionnaireMessage(
     male: 'Мужская анкета'
   };
   
-  let message = `<b>📋 Новая анкета: ${questionnaireNames[questionnaireId] || questionnaireId}</b>\n\n`;
+  let message = `<b>📋 Новая анкета: ${escapeHtml(questionnaireNames[questionnaireId] || questionnaireId)}</b>\n\n`;
   message += `<b>📅 Дата:</b> ${new Date().toLocaleString('ru-RU', { 
     day: '2-digit', 
     month: '2-digit', 
@@ -674,11 +718,11 @@ function formatQuestionnaireMessage(
   
   if (name || surname || age || weight) {
     message += `<b>👤 Основная информация:</b>\n`;
-    if (name) message += `Имя: ${name}\n`;
-    if (surname) message += `Фамилия: ${surname}\n`;
-    if (age) message += `Возраст: ${age}\n`;
-    if (weight) message += `Вес: ${weight} кг\n`;
-    if (height) message += `Рост: ${height} см\n`;
+    if (name) message += `Имя: ${escapeHtml(String(name))}\n`;
+    if (surname) message += `Фамилия: ${escapeHtml(String(surname))}\n`;
+    if (age) message += `Возраст: ${escapeHtml(String(age))}\n`;
+    if (weight) message += `Вес: ${escapeHtml(String(weight))} кг\n`;
+    if (height) message += `Рост: ${escapeHtml(String(height))} см\n`;
     message += `\n`;
   }
   
@@ -770,12 +814,11 @@ function formatQuestionnaireMessage(
     // Получаем вопрос из данных анкеты
     const questionLabel = getQuestionLabel(key, questionnaireId);
     const numberedLabel = shouldNumber ? `${questionNumber}. ${questionLabel}` : questionLabel;
-    message += `<b>${numberedLabel}:</b>\n`;
+    message += `<b>${escapeHtml(numberedLabel)}:</b>\n`;
     
     if (Array.isArray(value)) {
       // Обрабатываем checkbox значения
-      const questionnaire = getQuestionnaireById(questionnaireId);
-      const question = questionnaire?.questions.find(q => q.id === key);
+      const question = getQuestionDefinition(questionnaireId, key);
       
       const values = value.filter(v => v !== 'other' && v !== 'none');
       if (values.length > 0) {
@@ -783,16 +826,16 @@ function formatQuestionnaireMessage(
         if (question?.options) {
           const optionLabels = values.map(v => {
             const option = question.options?.find(opt => opt.value === v);
-            return option ? option.label : v;
+            return option ? option.label : String(v);
           });
-          message += optionLabels.map(v => `• ${v}`).join('\n') + '\n';
+          message += optionLabels.map(v => `• ${escapeHtml(v)}`).join('\n') + '\n';
         } else {
-          message += values.map(v => `• ${v}`).join('\n') + '\n';
+          message += values.map(v => `• ${escapeHtml(String(v))}`).join('\n') + '\n';
         }
       }
       // Добавляем "Другое" если есть
       if (value.includes('other') && formData[`${key}_other`]) {
-        message += `• Другое: ${formData[`${key}_other`]}\n`;
+        message += `• Другое: ${escapeHtml(String(formData[`${key}_other`]))}\n`;
       }
       if (value.includes('none')) {
         message += `• Не беспокоит\n`;
@@ -803,27 +846,14 @@ function formatQuestionnaireMessage(
       message += `📎 Загружено файлов: ${files.length}\n`;
       for (let i = 0; i < files.length; i++) {
         const file = files[i] as File;
-        message += `   ${i + 1}. ${file.name} (${(file.size / 1024).toFixed(1)} KB)\n`;
+        message += `   ${i + 1}. ${escapeHtml(file.name)} (${(file.size / 1024).toFixed(1)} KB)\n`;
       }
     } else {
-      // Обрабатываем radio и select значения
-      const questionnaire = getQuestionnaireById(questionnaireId);
-      const question = questionnaire?.questions.find(q => q.id === key);
-      
-      if (question?.options) {
-        const option = question.options.find(opt => opt.value === value);
-        if (option) {
-          message += `${option.label}\n`;
-        } else {
-          message += `${value}\n`;
-        }
-      } else {
-        message += `${value}\n`;
-      }
+      message += `${escapeHtml(getFormattedAnswerValue(questionnaireId, key, value))}\n`;
 
       // Для radio/select с "other" добавляем текст из поля key_other
       if (value === 'other' && formData[`${key}_other`]) {
-        message += `• Уточнение: ${formData[`${key}_other`]}\n`;
+        message += `• Уточнение: ${escapeHtml(String(formData[`${key}_other`]))}\n`;
       }
     }
     message += `\n`;
